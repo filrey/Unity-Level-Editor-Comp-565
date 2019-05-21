@@ -46,7 +46,7 @@ namespace UnityFBXExporter
 				Debug.LogError("The end of the path wasn't \".fbx\"");
 				return false;
 			}
-
+            
             MeshFilter[] meshFilters = gameObj.GetComponentsInChildren<MeshFilter>();
             CombineInstance[] combine = new CombineInstance[meshFilters.Length];
             int i = 0;

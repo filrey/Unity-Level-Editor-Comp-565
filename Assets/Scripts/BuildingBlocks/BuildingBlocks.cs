@@ -7,6 +7,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityFBXExporter;
 
 public class BuildingBlocks : MonoBehaviour {
 
@@ -16,12 +17,14 @@ public class BuildingBlocks : MonoBehaviour {
     Material blockMaterial;
     int selectedMaterialIndex = 0;
     public GameObject createdLevel;
+    public string newPath;
 
     // Use this for initialization
     void Start () {
         blockMaterial = availableMaterials[selectedMaterialIndex];
         createdLevel = new GameObject();
         createdLevel.name = "MyLevel";
+        newPath = GetNewPath(createdLevel, null);
     }
 
     public bool Explode;
@@ -235,6 +238,41 @@ public class BuildingBlocks : MonoBehaviour {
         //    Debug.Log(result.gameObject.name);
         //}
         return results.Count > 0;
+    }
+
+    public void UiExporting() {
+        FBXExporter exporter = new FBXExporter();
+        // exporter.ExportGameObjToFBX(createdLevel, newPath, true, true);
+    }
+
+    private static string GetNewPath(GameObject gameObject, string oldPath = null)
+    {
+        // NOTE: This must return a path with the starting "Assets/" or else textures won't copy right
+
+        string name = gameObject.name;
+
+        string newPath = null;
+        if (oldPath == null)
+            newPath = EditorUtility.SaveFilePanelInProject("Export FBX File", name + ".fbx", "fbx", "Export " + name + " GameObject to a FBX file");
+        else
+        {
+            if (oldPath.StartsWith("/Assets"))
+            {
+                oldPath = Application.dataPath.Remove(Application.dataPath.LastIndexOf("/Assets"), 7) + oldPath;
+                oldPath = oldPath.Remove(oldPath.LastIndexOf('/'), oldPath.Length - oldPath.LastIndexOf('/'));
+            }
+            newPath = EditorUtility.SaveFilePanel("Export FBX File", oldPath, name + ".fbx", "fbx");
+        }
+
+        int assetsIndex = newPath.IndexOf("Assets");
+
+        if (assetsIndex < 0)
+            return null;
+
+        if (assetsIndex > 0)
+            newPath = newPath.Remove(0, assetsIndex);
+
+        return newPath;
     }
 
 }
